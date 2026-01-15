@@ -36,7 +36,8 @@ const App: React.FC = () => {
     // 连接到后端服务器
     // 如果是 localhost，使用 localhost；否则使用当前主机的地址
     const hostname = window.location.hostname;
-    const serverUrl = `ws://${hostname === 'localhost' ? 'localhost' : hostname}:8080`;
+    const port = window.location.port || '3000';
+    const serverUrl = `ws://${hostname === 'localhost' ? 'localhost' : hostname}:${port}`;
     
     console.log(`[App] 连接到服务器: ${serverUrl}, 玩家名称: ${playerName}`);
     
@@ -136,7 +137,7 @@ const App: React.FC = () => {
           </div>
 
           <div className="text-center text-xs text-slate-600 space-y-1">
-            <p>服务器地址: ws://{window.location.hostname}:8080</p>
+            <p>服务器地址: ws://{window.location.hostname}:{window.location.port || '3000'}</p>
             <p>你的 ID 将由服务器自动分配</p>
           </div>
         </div>
@@ -161,7 +162,7 @@ const App: React.FC = () => {
                 </p>
                 {!connected && (
                   <p className="text-red-500 text-xs mt-2">
-                    连接地址: ws://{window.location.hostname}:8080
+                    连接地址: ws://{window.location.hostname}:{window.location.port || '3000'}
                   </p>
                 )}
             </div>
