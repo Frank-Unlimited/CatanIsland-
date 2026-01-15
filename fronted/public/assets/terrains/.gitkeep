@@ -1,0 +1,12 @@
+# 将你的地形图片放在这里
+
+需要的图片文件：
+- forest.png (森林)
+- hills.png (丘陵)
+- pasture.png (草原)
+- fields.png (田野)
+- mountains.png (山地)
+- desert.png (沙漠)
+
+建议尺寸：200x200px 或更大
+格式：PNG（支持透明背景）

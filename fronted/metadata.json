@@ -1,0 +1,5 @@
+{
+  "name": "Catan Client",
+  "description": "A React client implementation for the Settlers of Catan board game with WebSocket interface definition and interactive hexagonal map.",
+  "requestFramePermissions": []
+}
