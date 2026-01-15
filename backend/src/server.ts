@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { GameManager } from './game/GameManager';
 import { MessageType, WSMessage } from './types';
 
-const PORT = 8080;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 const gameManager = new GameManager();
 
 // 创建 HTTP 服务器
