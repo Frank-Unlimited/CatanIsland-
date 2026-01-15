@@ -5,14 +5,57 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer } from 'http';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, existsSync, statSync } from 'fs';
+import { join, extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { GameManager } from './game/GameManager';
 import { MessageType, WSMessage } from './types';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 const gameManager = new GameManager();
+
+// MIME 类型映射
+const MIME_TYPES: Record<string, string> = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.eot': 'application/vnd.ms-fontobject'
+};
+
+/**
+ * 提供静态文件服务
+ */
+function serveStaticFile(filePath: string, res: any) {
+  try {
+    if (!existsSync(filePath)) {
+      return false;
+    }
+
+    const stat = statSync(filePath);
+    if (!stat.isFile()) {
+      return false;
+    }
+
+    const ext = extname(filePath);
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    
+    const content = readFileSync(filePath);
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 // 创建 HTTP 服务器
 const httpServer = createServer((req, res) => {
@@ -50,7 +93,7 @@ const httpServer = createServer((req, res) => {
   }
 
   // 管理页面
-  if (req.url === '/admin' || req.url === '/') {
+  if (req.url === '/admin') {
     try {
       const html = readFileSync(join(__dirname, '../public/admin.html'), 'utf-8');
       res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -72,6 +115,31 @@ const httpServer = createServer((req, res) => {
       res.writeHead(404);
       res.end('Mobile page not found');
     }
+    return;
+  }
+
+  // 静态文件服务（前端应用）
+  const url = req.url || '/';
+  let filePath: string;
+
+  if (url === '/') {
+    // 根路径返回前端应用的 index.html
+    filePath = join(__dirname, '../public/dist/index.html');
+  } else if (url.startsWith('/assets/')) {
+    // 前端资源文件
+    filePath = join(__dirname, '../public/dist', url);
+  } else {
+    // 其他路径尝试作为静态文件
+    filePath = join(__dirname, '../public/dist', url);
+    
+    // 如果文件不存在，返回 index.html（支持前端路由）
+    if (!existsSync(filePath)) {
+      filePath = join(__dirname, '../public/dist/index.html');
+    }
+  }
+
+  // 尝试提供静态文件
+  if (serveStaticFile(filePath, res)) {
     return;
   }
 
