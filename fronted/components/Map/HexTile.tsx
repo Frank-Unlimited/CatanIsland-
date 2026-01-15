@@ -11,17 +11,6 @@ interface Props {
   isRobberMode?: boolean;
 }
 
-// 地形图片路径映射
-// 将图片文件放入 fronted/public/assets/terrains/ 文件夹
-const TERRAIN_IMAGES: Record<TerrainType, string> = {
-  [TerrainType.FOREST]: '/assets/terrains/forest.png',      // 森林 🌲 - 产出木材 (WOOD) - 深绿色
-  [TerrainType.HILLS]: '/assets/terrains/hills.png',        // 丘陵 🧱 - 产出砖块 (BRICK) - 红褐色
-  [TerrainType.PASTURE]: '/assets/terrains/pasture.png',    // 草原 🐑 - 产出羊毛 (SHEEP) - 浅绿色
-  [TerrainType.FIELDS]: '/assets/terrains/fields.png',      // 田野 🌾 - 产出粮食 (WHEAT) - 金黄色
-  [TerrainType.MOUNTAINS]: '/assets/terrains/mountains.png',// 山地 ⛰️ - 产出矿石 (ORE) - 灰色
-  [TerrainType.DESERT]: '/assets/terrains/desert.png',      // 沙漠 🏜️ - 无产出 - 黄褐色
-};
-
 /**
  * 六边形地形板块组件
  * 显示内容：
@@ -50,10 +39,6 @@ export const HexTile: React.FC<Props> = ({ hex, x, y, onRobberClick, isRobberMod
   // 为每个六边形生成唯一的图案ID
   const patternId = `pattern-${hex.id}`;
   const gradientId = `gradient-${hex.id}`;
-  const clipPathId = `clip-${hex.id}`;
-  
-  // 获取地形图片路径
-  const terrainImage = TERRAIN_IMAGES[hex.terrain];
 
   return (
     <g 
@@ -62,18 +47,13 @@ export const HexTile: React.FC<Props> = ({ hex, x, y, onRobberClick, isRobberMod
     >
       {/* 定义地形纹理图案 */}
       <defs>
-        {/* 六边形裁剪路径 - 用于裁剪图片 */}
-        <clipPath id={clipPathId}>
-          <polygon points={hexPolygonPoints} />
-        </clipPath>
-        
-        {/* 渐变背景（作为图片加载失败时的后备） */}
+        {/* 渐变背景 */}
         <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor={config.color} stopOpacity="1" />
           <stop offset="100%" stopColor={config.color} stopOpacity="0.7" />
         </radialGradient>
         
-        {/* SVG 纹理图案（作为后备，如果图片不存在则显示这些图案） */}
+        {/* SVG 纹理图案 */}
         <pattern id={patternId} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
           {hex.terrain === TerrainType.FOREST && (
             // 森林 🌲：树木圆点图案 - 产出木材
@@ -130,7 +110,7 @@ export const HexTile: React.FC<Props> = ({ hex, x, y, onRobberClick, isRobberMod
         </pattern>
       </defs>
       
-      {/* 基础六边形板块 - 使用渐变作为后备背景 */}
+      {/* 基础六边形板块 - 使用渐变背景 */}
       <polygon
         points={hexPolygonPoints}
         fill={`url(#${gradientId})`}
@@ -138,24 +118,11 @@ export const HexTile: React.FC<Props> = ({ hex, x, y, onRobberClick, isRobberMod
         strokeWidth="3"
       />
       
-      {/* 图片填充层 - 使用 clipPath 裁剪成六边形 */}
-      <g clipPath={`url(#${clipPathId})`}>
-        <image 
-          href={terrainImage}
-          x={x - HEX_SIZE * 1.2}
-          y={y - HEX_SIZE * 1.2}
-          width={HEX_SIZE * 2.4}
-          height={HEX_SIZE * 2.4}
-          preserveAspectRatio="xMidYMid slice"
-          opacity="0.9"
-        />
-      </g>
-      
-      {/* SVG 纹理图案覆盖层（半透明，增强细节） */}
+      {/* SVG 纹理图案覆盖层 */}
       <polygon
         points={hexPolygonPoints}
         fill={`url(#${patternId})`}
-        opacity="0.2"
+        opacity="0.3"
         pointerEvents="none"
       />
       
