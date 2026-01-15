@@ -5,7 +5,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { GameRoom, GameState, Player, GamePhase, ResourceType } from '../types';
+import { GameRoom, GameState, Player, GamePhase, ResourceType, PlayerResources } from '../types';
 import { generateMap } from '../utils/mapGenerator';
 
 export class GameManager {
@@ -286,12 +286,12 @@ export class GameManager {
   private grantStartingResources(state: GameState): void {
     const HEX_SIZE = 60;
     
-    const TERRAIN_RESOURCES: any = {
-      FOREST: 'WOOD',
-      HILLS: 'BRICK',
-      PASTURE: 'SHEEP',
-      FIELDS: 'WHEAT',
-      MOUNTAINS: 'ORE'
+    const TERRAIN_RESOURCES: Record<string, ResourceType> = {
+      FOREST: ResourceType.WOOD,
+      HILLS: ResourceType.BRICK,
+      PASTURE: ResourceType.SHEEP,
+      FIELDS: ResourceType.WHEAT,
+      MOUNTAINS: ResourceType.ORE
     };
 
     const hexToPixel = (q: number, r: number) => {
